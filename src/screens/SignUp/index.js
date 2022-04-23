@@ -10,7 +10,7 @@ import{
     SignMensageButtonTextBold
 
 } from './styles';
-
+import Api from '../../Api';
 import SignInput from '../../components/SignInput';
 import BarberLogo from '../../assets/barber.svg'
 import EmailIcon from  '../../assets/email.svg';
@@ -22,10 +22,22 @@ export default () => {
     const navigation = useNavigation();
 
      const [nameField, setNameField] = useState('');
-     const [emailField, setEmailField] = useState('suporte@b7web.com.br');
+     const [emailField, setEmailField] = useState('');
      const [passwordField, setPasswordField] = useState('');
       
-      const handleSignClick = ()=>{
+      const handleSignClick = async ()=>{
+          if(nameField != '' && emailField != '' && passwordField != ''){
+                  let res = await Api.signUp (nameField, emailField, passwordField);
+ 
+                 
+                  if(res.token){
+                    alert("DEU CERTO");
+                  } else{
+                      alert("Erro: " +res.error);
+                  }
+          } else {
+              alert("Prencha os campos!");
+          }
 
       }
 
@@ -47,7 +59,7 @@ export default () => {
                    IconSvg={PersonIcon}
                     placeholder="Digite seu Nome"
                     value={nameField}
-                    onChangeText={t=>setEmailField(t)}
+                    onChangeText={t=>setNameField(t)}
                    />
                    
                    <SignInput 
