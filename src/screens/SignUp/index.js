@@ -1,5 +1,8 @@
-import React, {useState} from  'react';
+import React, {useState, useContext} from  'react';
 import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorage from '@react-native-community/async-storage';
+
+import { UserContext } from '../../contexts/UserContext'; 
 import{
     Container,
     InputArea,
@@ -18,7 +21,7 @@ import LockIcon from    '../../assets/lock.svg';
 import PersonIcon from    '../../assets/person.svg';
 
 export default () => {
-    
+    const {dispatch: userDispatch } = useContext(UserContext); 
     const navigation = useNavigation();
 
      const [nameField, setNameField] = useState('');
@@ -31,7 +34,18 @@ export default () => {
  
                  
                   if(res.token){
-                    alert("DEU CERTO");
+                    await AsyncStorage.setItem('token', res.token);
+                     
+                    userDispatch({
+                       type: 'setAvatar',
+                       payload:{
+                         avatar: res.data.avatar
+                       }
+                    });
+
+                    navigation.reset({
+                         routes:[{name: 'MainTab'}]
+                    });
                   } else{
                       alert("Erro: " +res.error);
                   }

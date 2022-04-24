@@ -1,5 +1,8 @@
-import React, {useState} from  'react';
+import React, {useState, useContext} from  'react';
 import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorage from '@react-native-community/async-storage';
+
+import {UserContext} from  '../../contexts/UserContext';
 import{
     Container,
     InputArea,
@@ -18,19 +21,30 @@ import EmailIcon from  '../../assets/email.svg';
 import LockIcon from    '../../assets/lock.svg';
 
 export default () => {
-    
+     
+    const {dispatch: userDispatch } = useContext(UserContext); 
     const navigation = useNavigation();
-
-
      const [emailField, setEmailField] = useState('');
      const [passwordField, setPasswordField] = useState('');
       
       const handleSignClick =  async ()=>{
             if(emailField != ''&& passwordField !='' ){
-
                   let json = await Api.signIn(emailField, passwordField);
+  
                   if(json.token){
-                    alert( "DEU CERTO");
+                    await AsyncStorage.setItem('token', json.token);
+                     
+                    userDispatch({
+                       type: 'setAvatar',
+                       payload:{
+                         avatar: json.data.avatar
+                       }
+                    });
+
+                    navigation.reset({
+                         routes:[{name: 'MainTab'}]
+                    });
+
                   } else{
                       alert('E-mail e/ou senha errados!');
                   }
@@ -57,7 +71,7 @@ export default () => {
                    <SignInput 
                    IconSvg={EmailIcon}
                     placeholder="Digite seu Email"
-                    value={emailField}
+                        value={emailField}
                     onChangeText={t=>setEmailField(t)}
                    />
 
